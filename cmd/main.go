@@ -9,9 +9,9 @@ import (
 
 func main() {
 	r := gin.Default()
-	
-	db.RedisSetup()
-	routes.SetupRoutes(r)
+	rdb := 	db.RedisSetup()	
+
+	routes.SetupRoutes(r, rdb)
 
 	r.Run(":8080")
 }
