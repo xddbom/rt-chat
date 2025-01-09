@@ -16,7 +16,7 @@ var upgrader = websocket.Upgrader{
 
 type WebSocketHandler struct{}
 
-func(h *WebSocketHandler) WsHandle(c *gin.Context) {
+func(h *WebSocketHandler) Handle(c *gin.Context) {
     conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
     if err != nil {
         log.Println("Error upgrading connection:", err)
