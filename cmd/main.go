@@ -13,7 +13,7 @@ func main() {
 
 	routes.SetupRoutes(r, rdb)
 
-	fmt.Println("test ing workflow")
+	fmt.Println("testing workflow")
 
 	r.Run(":8080")
 }
