@@ -17,6 +17,12 @@ var upgrader = websocket.Upgrader{
 type WebSocketHandler struct{}
 
 func(h *WebSocketHandler) Handle(c *gin.Context) {
+    username, exists := c.Get("username")
+    if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Username not found"})
+        return
+    }
+
     conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
     if err != nil {
         log.Println("Error upgrading connection:", err)
@@ -25,7 +31,7 @@ func(h *WebSocketHandler) Handle(c *gin.Context) {
     }
     defer conn.Close()
 
-	log.Println("New WebSocket connection established")
+	log.Printf("User %s connected", username)
 
     for {
         _, msg, err := conn.ReadMessage()
@@ -34,7 +40,7 @@ func(h *WebSocketHandler) Handle(c *gin.Context) {
             break
         }
 
-        log.Printf("Received message: %s", msg)
+        log.Printf("[%s],: %s", username, msg)
 
         if err := conn.WriteMessage(websocket.TextMessage, msg); err != nil {
             log.Println("Error sending message:", err)
