@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  
+
   build:
     runs-on: ubuntu-latest
     services:
@@ -27,7 +27,7 @@ jobs:
       - name: Cache Go modules
         uses: actions/cache@v4
         with:
-          path: ~/.cache/go-build
+          path: ~/go/pkg/mod
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
