@@ -7,6 +7,7 @@ import (
 	"github.com/redis/go-redis/v9"
 
 	"github.com/xddbom/rt-chat/Handlers"
+	middlewares "github.com/xddbom/rt-chat/Middlewares"
 	"github.com/xddbom/rt-chat/db"
 )
 
@@ -22,5 +23,7 @@ func  SetupRoutes(r *gin.Engine, rdb *redis.Client) {
 	})
 
 	wsHandler := Handlers.WebSocketHandler{}
-	r.GET("/ws", wsHandler.Handle)
+	r.GET("/ws", middlewares.AuthMiddleware(), wsHandler.Handle)
+
+	r.POST("/login", Handlers.Login)
 } 

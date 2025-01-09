@@ -40,7 +40,7 @@ func(h *WebSocketHandler) Handle(c *gin.Context) {
             break
         }
 
-        log.Printf("[%s],: %s", username, msg)
+        log.Printf("[%s]: %s", username, msg)
 
         if err := conn.WriteMessage(websocket.TextMessage, msg); err != nil {
             log.Println("Error sending message:", err)
