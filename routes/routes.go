@@ -7,7 +7,7 @@ import (
 	"github.com/redis/go-redis/v9"
 
 	"github.com/xddbom/rt-chat/Handlers"
-	middlewares "github.com/xddbom/rt-chat/Middlewares"
+	"github.com/xddbom/rt-chat/Middlewares"
 	"github.com/xddbom/rt-chat/db"
 )
 

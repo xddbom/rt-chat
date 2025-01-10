@@ -17,8 +17,8 @@ var upgrader = websocket.Upgrader{
 type WebSocketHandler struct{}
 
 func(h *WebSocketHandler) Handle(c *gin.Context) {
-    username, exists := c.Get("username")
-    if !exists {
+    username := c.DefaultQuery("username", "")                      // query || c.Get (?)
+    if username == "" {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Username not found"})
         return
     }
