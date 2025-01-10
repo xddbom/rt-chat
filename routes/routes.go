@@ -19,7 +19,7 @@ func  SetupRoutes(r *gin.Engine, rdb *redis.Client) {
 	})
 
 	r.GET("/health", func(c *gin.Context){
-		db.HealthCheckc(c, rdb)
+		db.HealthCheck(c, rdb)
 	})
 
 	wsHandler := Handlers.WebSocketHandler{}

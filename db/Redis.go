@@ -8,8 +8,10 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
+var Client *redis.Client
+
 func RedisSetup() *redis.Client {
-	client := redis.NewClient(&redis.Options{
+	Client = redis.NewClient(&redis.Options{
         Addr:	  "localhost:6379",
         Password: "",
         DB:		  0,  
@@ -18,26 +20,26 @@ func RedisSetup() *redis.Client {
 
 	Ctx := context.Background()
 
-	err := client.Ping(Ctx).Err()
+	err := Client.Ping(Ctx).Err()
 	if err != nil {
 		panic(fmt.Sprintf("Connection error to Redis: %v", err))
 	}
 
-	err = client.Set(Ctx, "Connection", "successful!", 0).Err()
+	err = Client.Set(Ctx, "Connection", "successful!", 0).Err()
 	if err != nil {
 		panic(err)
 	}
 
-	val, err := client.Get(Ctx, "Connection").Result()
+	val, err := Client.Get(Ctx, "Connection").Result()
 	if err != nil {
 		panic(err)
 	} 
 	fmt.Println("Connection", val)
 
-	return client
+	return Client
 }
 
-func HealthCheckc (c *gin.Context, rdb *redis.Client) {
+func HealthCheck (c *gin.Context, rdb *redis.Client) {
 	ctx := context.Background()
 	err := rdb.Ping(ctx).Err()
 	if err != nil {
