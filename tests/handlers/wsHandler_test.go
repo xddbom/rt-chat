@@ -41,7 +41,7 @@ func TestWsHandler(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to read message: %v", err)
 	}
-a
+
 	_, msg, err := conn.ReadMessage()
 	if err != nil {
 		t.Fatalf("Failed to read message: %v", err)
