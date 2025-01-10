@@ -9,6 +9,7 @@ import (
 )
 
 var Client *redis.Client
+var Ctx = context.Background()
 
 func RedisSetup() *redis.Client {
 	Client = redis.NewClient(&redis.Options{
@@ -18,7 +19,7 @@ func RedisSetup() *redis.Client {
         Protocol: 2, 
     })
 
-	Ctx := context.Background()
+	Ctx = context.Background()
 
 	err := Client.Ping(Ctx).Err()
 	if err != nil {
@@ -38,6 +39,7 @@ func RedisSetup() *redis.Client {
 
 	return Client
 }
+
 
 func HealthCheck (c *gin.Context, rdb *redis.Client) {
 	ctx := context.Background()

@@ -14,6 +14,7 @@ func TestWsHandler(t *testing.T) {
 	serverReady := make(chan struct{})
 
 	go func() {
+		gin.SetMode(gin.ReleaseMode)
 		r := gin.Default()
 		wsHandler := Handlers.WebSocketHandler{}
 		r.GET("/ws", wsHandler.Handle)
@@ -39,7 +40,7 @@ func TestWsHandler(t *testing.T) {
 
 	err = conn.WriteMessage(websocket.TextMessage, []byte("Test"))
 	if err != nil {
-		t.Fatalf("failed to read message: %v", err)
+		t.Fatalf("Failed to read message: %v", err)
 	}
 
 	_, msg, err := conn.ReadMessage()
