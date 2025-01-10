@@ -14,6 +14,8 @@ var upgrader = websocket.Upgrader{
     },
 }
 
+var connections = make(map[string]*websocket.Conn)
+
 type WebSocketHandler struct{}
 
 func(h *WebSocketHandler) Handle(c *gin.Context) {
@@ -31,6 +33,13 @@ func(h *WebSocketHandler) Handle(c *gin.Context) {
     }
     defer conn.Close()
 
+    connections[username] = conn
+    defer func() {
+        delete(connections, username)
+        conn.Close()
+    }()
+
+
 	log.Printf("User %s connected", username)
 
     for {
@@ -42,9 +51,10 @@ func(h *WebSocketHandler) Handle(c *gin.Context) {
 
         log.Printf("[%s]: %s", username, msg)
 
-        if err := conn.WriteMessage(websocket.TextMessage, msg); err != nil {
-            log.Println("Error sending message:", err)
-			break
+        for _, c := range connections {
+            if err := c.WriteMessage(websocket.TextMessage, msg); err != nil {
+                log.Println("Error sending message:", err)
+            }
         }
     }
 }
