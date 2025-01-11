@@ -3,9 +3,11 @@ package Handlers
 import (
 	"log"
 	"net/http"
+    "time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gorilla/websocket"
+	"github.com/gorilla/websocket" 
+    "github.com/xddbom/rt-chat/db"
 )
 
 var upgrader = websocket.Upgrader{
@@ -19,9 +21,15 @@ var connections = make(map[string]*websocket.Conn)
 type WebSocketHandler struct{}
 
 func(h *WebSocketHandler) Handle(c *gin.Context) {
-    username := c.DefaultQuery("username", "")                      // query || c.Get (?)
+    chatID := c.Query("chatID")
+    if chatID == "" {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "ChatID is required"})
+        return
+    }
+
+    username := c.GetString("username")
     if username == "" {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Username not found"})
+        c.JSON(http.StatusUnauthorized, gin.H{"error": "Username not found"})
         return
     }
 
@@ -34,27 +42,35 @@ func(h *WebSocketHandler) Handle(c *gin.Context) {
     defer conn.Close()
 
     connections[username] = conn
-    defer func() {
-        delete(connections, username)
-        conn.Close()
-    }()
-
+    defer delete(connections, username)
 
 	log.Printf("User %s connected", username)
+
+    go db.Subscribe(chatID, func(msg map[string]string) {
+        if err := conn.WriteJSON(msg); err != nil {
+            log.Println("Error sending message to WebSocket:", err)
+        }
+    })
 
     for {
         _, msg, err := conn.ReadMessage()
         if err != nil {
-            log.Println("Error reading message:", err)
+            log.Println("Error reading WebSocket message:", err)
             break
         }
 
-        log.Printf("[%s]: %s", username, msg)
+        message := map[string]string{
+            "username": username,
+            "message":  string(msg),
+            "time":     time.Now().Format(time.RFC3339),
+        }
 
-        for _, c := range connections {
-            if err := c.WriteMessage(websocket.TextMessage, msg); err != nil {
-                log.Println("Error sending message:", err)
-            }
+        // Сохраняем и публикуем сообщение
+        if err := db.SaveMessage(chatID, message); err != nil {
+            log.Println("Error saving message to Redis:", err)
+        }
+        if err := db.Publish(chatID, message); err != nil {
+            log.Println("Error publishing message to Redis channel:", err)
         }
     }
 }
